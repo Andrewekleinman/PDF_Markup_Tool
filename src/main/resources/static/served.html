@@ -1,0 +1,82 @@
+<html>
+    <body onLoad="init()" style="width: 850px;height: 900px;border: none;">
+        <canvas id="can"  style="position:absolute;top:5px;left:5px;border:0px solid;" width="850px" height="900px"></canvas>
+        <embed src="/image" alt="logo" style="width: 850px;height: 900px;border: none;">
+        <!--<input type="button" value="save" id="btn" size="30" onClick="save()" style="position:absolute;top:10px;left:860px;">-->
+        <input type="button" value="clear" id="clr" size="23" onClick="erase()" style="position:absolute;top:10px;left:860px;">
+    </body>
+    <script type="text/javascript">
+        var press1x=press1y=press2x=press2y=currX=currY=0;
+        var canvas, ctx;
+        var x = "red";
+        var on = true;
+
+        function init() {
+            //at initialization, the canvas is defined and given event listeners
+            canvas = document.getElementById('can');
+            ctx = canvas.getContext("2d");
+            w = canvas.width;
+            h = canvas.height;
+
+            canvas.addEventListener("mousemove", function (e) {
+                findxy('move', e)
+            }, false);
+            canvas.addEventListener("mousedown", function (e) {
+                findxy('down', e)
+            }, false);
+            canvas.addEventListener("mouseup", function (e) {
+                findxy('up', e)
+            }, false);
+            canvas.addEventListener("mouseout", function (e) {
+                findxy('out', e)
+            }, false);
+        }
+
+        function draw() {
+            //draws a rectangle between the point the mouse was pressed and where it was released
+            ctx.beginPath();
+            ctx.strokeStyle = x;
+            ctx.rect(press1x, press1y, press2x-press1x, press2y-press1y);
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        function erase() {
+            //clears the canvas
+            var m = confirm("Would you like to erase all lines?");
+            if (m) {
+                ctx.clearRect(0, 0, w, h);
+                document.getElementById("canvasimg").style.display = "none";
+            }
+        }
+
+        function findxy(res, e) {
+            if (res == 'down') {
+                //note where the canvas was first clicked
+                currX = e.clientX - canvas.offsetLeft;
+                currY = e.clientY - canvas.offsetTop;
+                on = true;
+                press1x=currX;
+                press1y=currY;
+            }
+            if (res == 'up') {
+                //draw a rectangle from the point of the initial click to that of the release
+                press2x=currX;
+                press2y=currY;
+                if(on)
+                    draw();
+            }
+            if (res=='out') {
+                //if the mouse leaves the canvas, no lines will be drawn
+                on = false;
+            }
+            if (res == 'move') {
+                //tracks the movement of the mouse within the canvas
+                currX = e.clientX - canvas.offsetLeft;
+                currY = e.clientY - canvas.offsetTop;
+                press2x=currX;
+                press2y=currY;
+            }
+        }
+    </script>
+</html>
